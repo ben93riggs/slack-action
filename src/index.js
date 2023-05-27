@@ -61,7 +61,7 @@ function getText(status) {
     if (status.toLowerCase() === 'started') {
         return started;
     }
-    return 'status no valido';
+    return 'status not valid';
 }
 
 function generateSlackMessage(text) {
@@ -70,6 +70,7 @@ function generateSlackMessage(text) {
     const status = core.getInput("status");
     const channel = core.getInput("slack_channel");
     const username = core.getInput("slack_username");
+    const release_url = core.getInput("release_url");
     return {
         channel,
         username,
@@ -103,7 +104,12 @@ function generateSlackMessage(text) {
                        "type": "button",
                        "text": "Action Tab",
                        "url": `https://github.com/${owner}/${repo}/commit/${sha}/checks` 
-                    }                
+                    },
+                    {
+                        "type": "button",
+                        "text": "Release",
+                        "url": `${release_url}`
+                    }
                 ]               
             }
         ]

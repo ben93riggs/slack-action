@@ -8,6 +8,9 @@ inputs:
   slack_webhook_url:
     description: 'The Slack Webhook URL'
     required: true
+  release_url:
+    description: 'The URL for the release'
+    required: true
   slack_channel:
     description: 'The channel that receives the message. Override the default incoming Webhook Slack settings'
     required: false
