@@ -2,13 +2,13 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const fetch = require('node-fetch');
 
-const start_color = '#C8F1F3';
 const sucess_color = '#00C0C7';
-const cancelled_color = '#FFA900';
+const cancelled_color = '#a6a6a6';
 const failure_color = '#FF614E';
 
 function post(slackMessage) {
     const slack_webhook_url = core.getInput("slack_webhook_url");
+
     fetch(slack_webhook_url, {
         method: 'POST',
         body: JSON.stringify(slackMessage),
@@ -19,96 +19,104 @@ function post(slackMessage) {
      try {   
        throw new Error(`[Error] Missing Slack Incoming Webhooks URL
            Please configure "SLACK_WEBHOOK" as environment variable or
-           specify the key called "slack_webhook_url" in "with" section`);
+           specify the key "slack_webhook_url" in the actions configuration.`);
        } 
        catch (error) {	
            console.error(error.message);	
        }
-    } 
+    }
  }
 
 function getColor(status) {
-    
     if (status.toLowerCase() === 'success') {
         return sucess_color;
-    }
-    if (status.toLowerCase() === 'cancelled') {
+    } else if (status.toLowerCase() === 'failure') {
+        return failure_color;
+    } else {
         return cancelled_color;
     }
-    if (status.toLowerCase() === 'failure') {
-        return failure_color;
-    }
-    return start_color;
 }
 
 function getText(status) {
-    succeeded = `:white_check_mark: *${github.context.workflow}* *success*`;
-    cancelled = `:warning: *${github.context.workflow}* *canceled*`;
-    failure =   `<!here> *${github.context.workflow}* *failure*`;
-    
     if (status.toLowerCase() === 'success') {
-        return succeeded;
+        return `*${github.context.workflow}* has run *successfully*`;
+    } else if (status.toLowerCase() === 'cancelled') {
+        return `*${github.context.workflow}* was *cancelled*`;
+    } else {
+        return `*${github.context.workflow}* has *failed* <!here>`;
     }
-    if (status.toLowerCase() === 'cancelled') {
-        return cancelled;
-    }
-    if (status.toLowerCase() === 'failure') {
-        return failure;
-    }
-
-    return 'status not valid';
 }
 
 function generateSlackMessage(text) {
-    const { sha } = github.context;
-    const { owner, repo } = github.context.repo;
+    const { sha, repo, ref } = github.context;
     const status = core.getInput("status");
     const channel = core.getInput("slack_channel");
     const username = core.getInput("slack_username");
     const release_url = core.getInput("release_url");
+    const base_url = `https://github.com/${repo.owner}/${repo.repo}`;
 
     let actions = [
         {
             "type": "button",
-            "text": "Commit", 
-            "url": `https://github.com/${owner}/${repo}/commit/${sha}` 
+            "text": {
+                "type": "plain_text",
+                "emoji": true,
+                "text": "Commit"
+            },
+            "url": `${base_url}/commit/${sha}`,
         },
         {
             "type": "button",
-            "text": "Action Tab",
-            "url": `https://github.com/${owner}/${repo}/commit/${sha}/checks` 
+            "text": {
+                "type": "plain_text",
+                "emoji": true,
+                "text": "Action Tab"
+            },
+            "url": `${base_url}/commit/${sha}/checks`
         }
     ];
     
     if (release_url) {
         actions.push({
             "type": "button",
-            "text": "Release",
-            "url": `${release_url}`
+            "text": {
+                "type": "plain_text",
+                "emoji": true,
+                "text": "Release"
+            },
+            "style": "primary",
+            "url": release_url
         });
     }
 
     return {
         channel,
         username,
-        text: getText(status),
         attachments: [
             {
-                fallback: text,
-                color: getColor(status),
-                "fields": [
+                "color": getColor(status),
+                "blocks": [
                     {
-                        "title": "Repository",
-                        "value": `<https://github.com/${owner}/${repo}|${owner}/${repo}>`,
-                        "short": true
-                    },      
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": getText(status)
+                        }
+                    },
                     {
-                        "title": "Ref",
-                        "value": github.context.ref,
-                        "short": true
-                    },                   
-                ],
-                "actions": actions     
+                        "type": "section",
+                        "fields": [
+                            {
+                                "type": "mrkdwn",
+                                "text": `*Repository:*\n<${base_url}|${repo.repo}> (<${base_url}/commit/${sha}|${ref}>)`
+                            },
+                        ]
+                    },
+                    {
+                        "type": "actions",
+                        "elements": actions
+                    }
+                ]
             }
         ]
     };
@@ -116,5 +124,5 @@ function generateSlackMessage(text) {
 try {
     post(generateSlackMessage('Sending message'));
 } catch (error) {
-  core.setFailed(`[Error] There was an error when sending the slack notification`);
+    core.setFailed(`[Error] There was an error when sending the slack notification`);
 } 

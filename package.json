@@ -1,5 +1,5 @@
 {
-  "name": "slack-message-github-action",
+  "name": "slack-message-gh-action",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,18 +8,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/raulanatol/slack-message-github-action.git"
+    "url": "git+https://github.com/ben93riggs/slack-action.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/raulanatol/slack-message-github-action/issues"
+    "url": "https://github.com/ben93riggs/slack-action/issues"
   },
-  "homepage": "https://github.com/raulanatol/slack-message-github-action#readme",
+  "homepage": "https://github.com/raulanatol/slack-action#readme",
   "dependencies": {
-    "@actions/core": "^1.2.3",
-    "@actions/github": "^2.1.1",
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
     "node-fetch": "^2.6.1"
   }
 }
