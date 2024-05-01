@@ -71,6 +71,28 @@ function generateSlackMessage(text) {
     const channel = core.getInput("slack_channel");
     const username = core.getInput("slack_username");
     const release_url = core.getInput("release_url");
+
+    let actions = [
+        {
+            "type": "button",
+            "text": "Commit", 
+            "url": `https://github.com/${owner}/${repo}/commit/${sha}` 
+        },
+        {
+            "type": "button",
+            "text": "Action Tab",
+            "url": `https://github.com/${owner}/${repo}/commit/${sha}/checks` 
+        }
+    ];
+    
+    if (release_url) {
+        actions.push({
+            "type": "button",
+            "text": "Release",
+            "url": `${release_url}`
+        });
+    }
+
     return {
         channel,
         username,
@@ -94,23 +116,7 @@ function generateSlackMessage(text) {
                         "short": true
                     },                   
                 ],
-                "actions": [ 
-                    {
-                       "type": "button",
-                       "text": "Commit", 
-                       "url": `https://github.com/${owner}/${repo}/commit/${sha}` 
-                    },
-                    {
-                       "type": "button",
-                       "text": "Action Tab",
-                       "url": `https://github.com/${owner}/${repo}/commit/${sha}/checks` 
-                    },
-                    {
-                        "type": "button",
-                        "text": "Release",
-                        "url": `${release_url}`
-                    }
-                ]               
+                "actions": actions     
             }
         ]
     };

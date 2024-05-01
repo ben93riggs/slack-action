@@ -10,7 +10,7 @@ inputs:
     required: true
   release_url:
     description: 'The URL for the release'
-    required: true
+    required: false
   slack_channel:
     description: 'The channel that receives the message. Override the default incoming Webhook Slack settings'
     required: false
