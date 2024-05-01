@@ -42,12 +42,9 @@ function getColor(status) {
 }
 
 function getText(status) {
-    const actor = github.context.actor;
-    const workflow = github.context.workflow;	
-    started = `<http://github.com/${actor}|${actor}>` + ' has *started* the "' + `${workflow}`  + '"' + ' workflow ';
-    succeeded = 'The workflow "' + `${workflow}` + '"' + ' was completed *successfully* by ' + `<http://github.com/${actor}|${actor}>`;
-    cancelled = ':warning: The workflow "' + `${workflow}` + '"' + ' was *canceled* by ' + `<http://github.com/${actor}|${actor}>`;
-    failure = '<!here> The workflow "' + `${workflow}` + '"' + ' *failed*';
+    succeeded = `:white_check_mark: *${github.context.workflow}* *success*`;
+    cancelled = `:warning: *${github.context.workflow}* *canceled*`;
+    failure =   `<!here> *${github.context.workflow}* *failure*`;
     
     if (status.toLowerCase() === 'success') {
         return succeeded;
@@ -58,9 +55,7 @@ function getText(status) {
     if (status.toLowerCase() === 'failure') {
         return failure;
     }
-    if (status.toLowerCase() === 'started') {
-        return started;
-    }
+
     return 'status not valid';
 }
 
@@ -101,9 +96,6 @@ function generateSlackMessage(text) {
             {
                 fallback: text,
                 color: getColor(status),
-                footer: `<https://craftech.io|Powered By Craftech>`,
-                footer_icon: `https://craftech.io/mail-signature/craftech-logo.png`,
-                ts: Math.floor(Date.now() / 1000),
                 "fields": [
                     {
                         "title": "Repository",

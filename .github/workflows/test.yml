@@ -16,21 +16,21 @@ jobs:
         with:
           status: success
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          release_url: google.com
+          release_url: https://appliedolap.com
         if: always()
 
       - uses: ./
         with:
           status: cancelled 
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          release_url: google.com
+          release_url: https://appliedolap.com
         if: always()
         
       - uses: ./
         with:
           status: failure
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          release_url: google.com
+          release_url: https://appliedolap.com
         if: always()
       
       - uses: ./
