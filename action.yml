@@ -8,6 +8,7 @@ inputs:
   slack_webhook_url:
     description: 'The Slack Webhook URL'
     required: true
+    default: ${{ secrets.SLACK_WEBHOOK_URL }}
   slack_channel:
     description: 'The channel that receives the message. Override the default incoming Webhook Slack settings'
     required: false
