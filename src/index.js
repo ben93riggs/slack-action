@@ -47,7 +47,7 @@ function getText(status, base_url, sha, repo) {
     }
 }
 
-function generateSlackMessage(text) {
+function generateSlackMessage() {
     try {
         const { sha, repo, ref } = github.context;
         const status = core.getInput("status");
@@ -94,7 +94,7 @@ function generateSlackMessage(text) {
 }
 
 try {
-    post(generateSlackMessage('Sending message'));
+    post(generateSlackMessage());
 } catch (error) {
     core.setFailed(`[Error] There was an error when sending the slack notification`);
 } 
