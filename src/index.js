@@ -37,90 +37,62 @@ function getColor(status) {
     }
 }
 
-function getText(status) {
+function getText(status, base_url, sha, repo) {
     if (status.toLowerCase() === 'success') {
-        return `*${github.context.workflow}* has run *successfully*`;
+        return `<${base_url}|${repo.repo}> / *<${base_url}/commit/${sha}/checks|${github.context.workflow}>* has run *successfully*`;
     } else if (status.toLowerCase() === 'cancelled') {
-        return `*${github.context.workflow}* was *cancelled*`;
+        return `<${base_url}|${repo.repo}> / *<${base_url}/commit/${sha}/checks|${github.context.workflow}>* was *cancelled*`;
     } else {
-        return `*${github.context.workflow}* has *failed* <!here>`;
+        return `<${base_url}|${repo.repo}> / *<${base_url}/commit/${sha}/checks|${github.context.workflow}>* has *failed* <!here>`;
     }
 }
 
 function generateSlackMessage(text) {
-    const { sha, repo, ref } = github.context;
-    const status = core.getInput("status");
-    const channel = core.getInput("slack_channel");
-    const username = core.getInput("slack_username");
-    const release_url = core.getInput("release_url");
-    const base_url = `https://github.com/${repo.owner}/${repo.repo}`;
+    try {
+        const { sha, repo, ref } = github.context;
+        const status = core.getInput("status");
+        const channel = core.getInput("slack_channel");
+        const username = core.getInput("slack_username");
+        const tag_name = core.getInput("tag_name");
+        const base_url = `https://github.com/${repo.owner}/${repo.repo}`;
 
-    let actions = [
-        {
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "emoji": true,
-                "text": "Commit"
-            },
-            "url": `${base_url}/commit/${sha}`,
-        },
-        {
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "emoji": true,
-                "text": "Action Tab"
-            },
-            "url": `${base_url}/commit/${sha}/checks`
-        }
-    ];
-    
-    if (release_url) {
-        actions.push({
-            "type": "button",
-            "text": {
-                "type": "plain_text",
-                "emoji": true,
-                "text": "Release"
-            },
-            "style": "primary",
-            "url": release_url
-        });
-    }
-
-    return {
-        channel,
-        username,
-        attachments: [
+        let blocks = [
             {
-                "color": getColor(status),
-                "blocks": [
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": getText(status, base_url, ref, repo)
+                }
+            },
+            {
+                "type": "section",
+                "fields": [
                     {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": getText(status)
-                        }
+                        "type": "mrkdwn",
+                        "text": tag_name 
+                            ? `*Release:*\n<${base_url}/releases/tag/${tag_name}|${tag_name}> (<${base_url}/commit/${sha}|${ref}>)` 
+                            : `*Ref:* <${base_url}/commit/${sha}|${ref}>)`
                     },
-                    {
-                        "type": "section",
-                        "fields": [
-                            {
-                                "type": "mrkdwn",
-                                "text": `*Repository:*\n<${base_url}|${repo.repo}> (<${base_url}/commit/${sha}|${ref}>)`
-                            },
-                        ]
-                    },
-                    {
-                        "type": "actions",
-                        "elements": actions
-                    }
                 ]
             }
-        ]
-    };
+        ];
+
+        return {
+            channel,
+            username,
+            attachments: [
+                {
+                    "color": getColor(status),
+                    "blocks": blocks
+                }
+            ]
+        };
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
 }
+
 try {
     post(generateSlackMessage('Sending message'));
 } catch (error) {

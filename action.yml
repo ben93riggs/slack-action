@@ -8,15 +8,16 @@ inputs:
   slack_webhook_url:
     description: 'The Slack Webhook URL'
     required: true
-  release_url:
-    description: 'The URL for the release'
-    required: false
   slack_channel:
     description: 'The channel that receives the message. Override the default incoming Webhook Slack settings'
     required: false
   slack_username:
     description: 'The name that send the message, example: Github. Override the default incoming Webhook Slack settings '
     required: false
+  tag_name:
+    description: 'The tag associated with the release'
+    required: false
+    default: ${{ env.TAGNAME }}
 runs:
   using: node20
   main: src/index.js

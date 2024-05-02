@@ -10,7 +10,7 @@
 | `status`              | ***Optional***    | Used to force a status to report. Defaults to `${{ job.status }}`.<br>Valid inputs are:`success`, `failure`, or `cancelled`.
 | `slack_channel`       | ***Optional***    | Overrides the default webhook channel setting. 
 | `slack_username`      | ***Optional***    | Overrides the default webhook username setting. 
-| `release_url`         | ***Optional***    | Adds a 'release' button to the message that links to the github release.
+| `tag_name`            | ***Optional***    | Adds a 'release' button to the message that links to the github release. Defaults to `${{ env.TAGNAME }}`.
 
 ## Usage
 
