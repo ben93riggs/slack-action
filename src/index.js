@@ -48,49 +48,44 @@ function getText(status, base_url, sha, repo) {
 }
 
 function generateSlackMessage() {
-    try {
-        const { sha, repo, ref } = github.context;
-        const status = core.getInput("status");
-        const channel = core.getInput("slack_channel");
-        const username = core.getInput("slack_username");
-        const tag_name = core.getInput("tag_name");
-        const base_url = `https://github.com/${repo.owner}/${repo.repo}`;
+    const { sha, repo, ref } = github.context;
+    const status = core.getInput("status");
+    const channel = core.getInput("slack_channel");
+    const username = core.getInput("slack_username");
+    const tag_name = core.getInput("tag_name");
+    const base_url = `https://github.com/${repo.owner}/${repo.repo}`;
 
-        let blocks = [
-            {
-                "type": "section",
-                "text": {
-                    "type": "mrkdwn",
-                    "text": getText(status, base_url, ref, repo)
-                }
-            },
-            {
-                "type": "section",
-                "fields": [
-                    {
-                        "type": "mrkdwn",
-                        "text": tag_name 
-                            ? `*Release:*\n<${base_url}/releases/tag/${tag_name}|${tag_name}> (<${base_url}/commit/${sha}|${ref}>)` 
-                            : `*Ref:* <${base_url}/commit/${sha}|${ref}>)`
-                    },
-                ]
+    let blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": getText(status, base_url, ref, repo)
             }
-        ];
-
-        return {
-            channel,
-            username,
-            attachments: [
+        },
+        {
+            "type": "section",
+            "fields": [
                 {
-                    "color": getColor(status),
-                    "blocks": blocks
-                }
+                    "type": "mrkdwn",
+                    "text": tag_name 
+                        ? `*Ref:* <${base_url}/commit/${sha}|${ref}>\n*Release:* <${base_url}/releases/tag/${tag_name}|${tag_name}>` 
+                        : `*Ref:* <${base_url}/commit/${sha}|${ref}>`
+                },
             ]
-        };
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
+        }
+    ];
+
+    return {
+        channel,
+        username,
+        attachments: [
+            {
+                "color": getColor(status),
+                "blocks": blocks
+            }
+        ]
+    };
 }
 
 try {

@@ -23,7 +23,6 @@ jobs:
         with:
           status: cancelled 
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          tag_name: v8.4.0-SNAPSHOT
         if: always()
         
       - uses: ./
