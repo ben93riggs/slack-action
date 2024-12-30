@@ -60,7 +60,7 @@ function generateSlackMessage() {
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": getText(status, base_url, ref, repo)
+                "text": getText(status, base_url, sha, repo)
             }
         },
         {
